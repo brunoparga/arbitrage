@@ -23,22 +23,16 @@ def validate_inputs(input_pairs):
 
 def calculate_probabilities(yes_data, no_data):
     # Extract buy-ins and payouts
-    yes_buy_ins, yes_payouts = zip(*yes_data)
-    no_buy_ins, no_payouts = zip(*no_data)
-
-    print("Now, within calculate_probabilities...")
-    print(f"yes_buy_ins: {yes_buy_ins}")
-    print(f"yes_payouts: {yes_payouts}")
-    print(f"no_buy_ins: {no_buy_ins}")
-    print(f"no_payouts: {no_payouts}")
+    yes_buy_ins, yes_payouts = yes_data[0], yes_data[1]
+    no_buy_ins, no_payouts = no_data[0], no_data[1]
 
     # Calculate average odds for "yes" and "no" bets
-    yes_odds = sum(yes_payout / buy_in for buy_in, yes_payout in yes_data) / len(yes_data)
-    no_odds = sum(no_payout / buy_in for buy_in, no_payout in no_data) / len(no_data)
+    yes_odds = np.mean(yes_payouts / yes_buy_ins)
+    no_odds = np.mean(no_payouts / no_buy_ins)
 
     # Convert odds to implied probabilities
     yes_prob = 1 / (1 + yes_odds)
-    no_prob = 1 / (1 + no_odds)
+    no_prob = 1 - (1 / (1 + no_odds))
 
     # Normalize probabilities to sum up to 1 (or 100%)
     total_prob = yes_prob + no_prob
@@ -57,10 +51,11 @@ def approximate_payouts(data):
 def optimize(yes_data, no_data):
     yes_curve = approximate_payouts(yes_data)
     no_curve = approximate_payouts(no_data)
+    yes_prob, no_prob = calculate_probabilities(yes_data, no_data)
 
     def expected_value(yes_buy, no_buy):
-        yes_gain = p_yes * yes_curve(yes_buy)
-        no_gain = p_no * no_curve(no_buy)
+        yes_gain = yes_prob * yes_curve(yes_buy)
+        no_gain = no_prob * no_curve(no_buy)
         total_buy = yes_buy + no_buy
         return yes_gain + no_gain - total_buy
 
@@ -99,14 +94,14 @@ def visualize(result):
 def main(yes_market, no_market):
     yes_data = validate_inputs(yes_market)
     no_data = validate_inputs(no_market)
-    print(f"yes_data within main: {yes_data}")
-    print(f"no_data within main: {no_data}")
 
-    yes_prob, no_prob = calculate_probabilities(yes_market, no_market)
-    print(f"YES probability: {yes_prob:.2f}, NO probability: {no_prob:.2f}")
-    # optimized_result = optimize(yes_data, no_data)
-    # visualize(optimized_result)
+    optimized_result = optimize(yes_data, no_data)
+    visualize(optimized_result)
 
-yes_market = [(10, 35), (12, 41), (20, 68), (25, 85), (30, 101)]
-no_market = [(1, 14), (10, 28), (12, 30), (20, 41), (30, 55)]
-main(yes_market, no_market)
+yes_drake = [(10, 35), (12, 41), (20, 68), (25, 85), (30, 101)]
+no_drake = [(1, 14), (10, 28), (12, 30), (20, 41), (30, 55)]
+
+yes_caleb = [(15, 17), (25, 29), (35, 40), (45, 52), (60, 69)]
+no_caleb = [(5, 112), (15, 300), (25, 451), (35, 573), (45, 674)]
+
+main(yes_caleb, no_caleb)
