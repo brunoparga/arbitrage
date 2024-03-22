@@ -10,13 +10,27 @@ matplotlib = "*"
 flake8 = "*"
 mypy = "*"
 black = "*"
-isort = "*"
 pylint = "*"
-bandit = "*"
 pytest = "*"
 coverage = "*"
+flake8-pyproject = "*"
+bandit = {version = "*", extras = ["toml"]}
 
 [dev-packages]
 
 [requires]
 python_version = "3.11"
+
+[scripts]
+lint = """
+  black .
+  flake8 .
+  mypy .
+  pylint **/*.py
+  bandit -c pyproject.toml -r .
+"""
+test = "pytest"
+cov = """
+  coverage run -m pytest
+  coverage report
+"""

@@ -1,0 +1,26 @@
+[tool.bandit]
+exclude_dirs = ["tests"]
+
+[tool.black]
+line-length = 79
+target-version = ["py311"]
+
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", "*/__init__.py"]
+
+[tool.flake8]
+max-line-length = 79
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+disallow_untyped_defs = true
+
+[tool.pylint."messages control"]
+disable = ["missing-module-docstring", "missing-class-docstring", "missing-function-docstring"]
+
+[tool.pytest.ini_options]
+# testpaths = ["tests"]

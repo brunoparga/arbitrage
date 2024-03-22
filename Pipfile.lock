@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "76324ab65eb431ce58393d57465468c9272c9e66fb08e698bc698219262602c6"
+            "sha256": "b0cb197a14dc1bf6855c97d3ca155d0a2daea0e091a975d739c248e34adb4ea0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -25,6 +25,9 @@
             "version": "==3.1.0"
         },
         "bandit": {
+            "extras": [
+                "toml"
+            ],
             "hashes": [
                 "sha256:36de50f720856ab24a24dbaa5fee2c66050ed97c1477e0a1159deab1775eab6b",
                 "sha256:509f7af645bc0cd8fd4587abc1a038fc795636671ee8204d502b933aee44f381"
@@ -200,6 +203,13 @@
             "index": "pypi",
             "version": "==7.0.0"
         },
+        "flake8-pyproject": {
+            "hashes": [
+                "sha256:6249fe53545205af5e76837644dc80b4c10037e73a0e5db87ff562d75fb5bd4a"
+            ],
+            "index": "pypi",
+            "version": "==1.2.3"
+        },
         "fonttools": {
             "hashes": [
                 "sha256:0743fd2191ad7ab43d78cd747215b12033ddee24fa1e088605a3efe80d6984de",
@@ -261,7 +271,7 @@
                 "sha256:48fdfcb9face5d58a4f6dde2e72a1fb8dcaf8ab26f95ab49fab84c2ddefb0109",
                 "sha256:8ca5e72a8d85860d5a3fa69b8745237f2939afe12dbf656afbcb47fe72d947a6"
             ],
-            "index": "pypi",
+            "markers": "python_full_version >= '3.8.0'",
             "version": "==5.13.2"
         },
         "kiwisolver": {
