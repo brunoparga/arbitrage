@@ -7,9 +7,16 @@ name = "pypi"
 numpy = "*"
 scipy = "*"
 matplotlib = "*"
+flake8 = "*"
+mypy = "*"
+black = "*"
+isort = "*"
+pylint = "*"
+bandit = "*"
+pytest = "*"
+coverage = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.11"
-python_full_version = "3.11.6"
