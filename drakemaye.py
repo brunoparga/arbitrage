@@ -1,25 +1,29 @@
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 from scipy.optimize import curve_fit, minimize
+
 
 def validate_inputs(input_pairs):
     for x, y in input_pairs:
         if x <= 0:
             raise ValueError(f"Negative buy-in found in input {input_pairs}.")
         if y < x:
-            raise ValueError(f"Negative net payout found in input {input_pairs}.")
+            raise ValueError(
+                f"Negative net payout found in input {input_pairs}."
+            )
 
     sorted_buy_ins = sorted(input_pairs, key=lambda pair: pair[0])
     buy_ins, payouts = zip(*sorted_buy_ins)
 
     for i in range(1, len(payouts)):
-        if payouts[i] < payouts[i-1]:
+        if payouts[i] < payouts[i - 1]:
             raise ValueError(
                 f"Payouts must always increase, but as the buy-in of {buy_ins[i-1]} grows to {buy_ins[i]}, the payout decreases from {payouts[i-1]} to {payouts[i]}."
             )
 
     return np.array(buy_ins), np.array(payouts)
+
 
 def calculate_probabilities(yes_data, no_data):
     # Extract buy-ins and payouts
@@ -41,12 +45,20 @@ def calculate_probabilities(yes_data, no_data):
 
     return yes_prob_normalized, no_prob_normalized
 
+
 def approximate_payouts(data):
     buy_ins, payouts = data
-    initial_guess = [(max(payouts) - min(payouts)) / np.log(max(buy_ins)), 1, min(payouts)]
+    initial_guess = [
+        (max(payouts) - min(payouts)) / np.log(max(buy_ins)),
+        1,
+        min(payouts),
+    ]
     fun = lambda x, a, b, c: a * np.log(x + b) + c
-    (a, b, c), _ = curve_fit(fun, buy_ins, payouts, p0=initial_guess, maxfev=10000)
+    (a, b, c), _ = curve_fit(
+        fun, buy_ins, payouts, p0=initial_guess, maxfev=10000
+    )
     return lambda x: fun(x, a, b, c)
+
 
 def optimize(yes_data, no_data):
     yes_curve = approximate_payouts(yes_data)
@@ -66,9 +78,15 @@ def optimize(yes_data, no_data):
     bounds = [(0, None), (0, None)]
     result = minimize(neg_expected_value, initial_guess, bounds=bounds)
     opt_yes_buy, opt_no_buy = result.x if result.success else (0, 0)
-    opt_yes_buy, opt_no_buy = int(np.round(opt_yes_buy)), int(np.round(opt_no_buy))
-    opt_ev = expected_value(opt_yes_buy, opt_no_buy)  # Recalculate EV for rounded values
-    print(f"Optimal YES buy: {opt_yes_buy}, Optimal NO buy: {opt_no_buy}, Optimal Expected Value: {opt_ev:.2f}")
+    opt_yes_buy, opt_no_buy = int(np.round(opt_yes_buy)), int(
+        np.round(opt_no_buy)
+    )
+    opt_ev = expected_value(
+        opt_yes_buy, opt_no_buy
+    )  # Recalculate EV for rounded values
+    print(
+        f"Optimal YES buy: {opt_yes_buy}, Optimal NO buy: {opt_no_buy}, Optimal Expected Value: {opt_ev:.2f}"
+    )
 
     # Grid for visualization
     yes_buy_range = np.linspace(0, max(yes_data[0]), 100)
@@ -76,20 +94,44 @@ def optimize(yes_data, no_data):
     yes_buy_mesh, no_buy_mesh = np.meshgrid(yes_buy_range, no_buy_range)
     expected_values = np.vectorize(expected_value)(yes_buy_mesh, no_buy_mesh)
 
-    return yes_buy_mesh, no_buy_mesh, expected_values, opt_yes_buy, opt_no_buy, opt_ev
+    return (
+        yes_buy_mesh,
+        no_buy_mesh,
+        expected_values,
+        opt_yes_buy,
+        opt_no_buy,
+        opt_ev,
+    )
+
 
 def visualize(result):
-    yes_buy_mesh, no_buy_mesh, expected_values, opt_yes_buy, opt_no_buy, opt_ev = result
+    (
+        yes_buy_mesh,
+        no_buy_mesh,
+        expected_values,
+        opt_yes_buy,
+        opt_no_buy,
+        opt_ev,
+    ) = result
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    surface = ax.plot_surface(yes_buy_mesh, no_buy_mesh, expected_values, cmap='viridis', edgecolor='none')
-    ax.scatter(opt_yes_buy, opt_no_buy, opt_ev, color='r', s=50)  # Optimal point
+    ax = fig.add_subplot(111, projection="3d")
+    surface = ax.plot_surface(
+        yes_buy_mesh,
+        no_buy_mesh,
+        expected_values,
+        cmap="viridis",
+        edgecolor="none",
+    )
+    ax.scatter(
+        opt_yes_buy, opt_no_buy, opt_ev, color="r", s=50
+    )  # Optimal point
 
     fig.colorbar(surface, ax=ax, shrink=0.5, aspect=5)
-    ax.set_xlabel('Buy YES')
-    ax.set_ylabel('Buy NO')
-    ax.set_zlabel('Expected Value')
+    ax.set_xlabel("Buy YES")
+    ax.set_ylabel("Buy NO")
+    ax.set_zlabel("Expected Value")
     plt.show()
+
 
 def main(yes_market, no_market):
     yes_data = validate_inputs(yes_market)
@@ -97,6 +139,7 @@ def main(yes_market, no_market):
 
     optimized_result = optimize(yes_data, no_data)
     visualize(optimized_result)
+
 
 yes_drake = [(10, 35), (12, 41), (20, 68), (25, 85), (30, 101)]
 no_drake = [(1, 14), (10, 28), (12, 30), (20, 41), (30, 55)]
