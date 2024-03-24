@@ -23,14 +23,11 @@ python_version = "3.11"
 
 [scripts]
 lint = """
+  bandit -c pyproject.toml -r .
   black .
   flake8 .
   mypy .
   pylint **/*.py
-  bandit -c pyproject.toml -r .
 """
 test = "pytest"
-cov = """
-  coverage run -m pytest
-  coverage report
-"""
+cov = "coverage run -m pytest && coverage report"
