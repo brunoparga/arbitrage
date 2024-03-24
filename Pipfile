@@ -22,12 +22,17 @@ bandit = {version = "*", extras = ["toml"]}
 python_version = "3.11"
 
 [scripts]
-lint = """
-  bandit -c pyproject.toml -r .
-  black .
-  flake8 .
+lint = """sh -c '
+  echo "Formatting the code with black..."; \
+  black .; \
+  echo "Finding security vulnerabilities with bandit..."; \
+  bandit -c pyproject.toml -r .; \
+  echo "Linting the code with flake8 and pylint..."; \
+  pylint **/*.py; \
+  flake8 .; \
+  echo "Typechecking with mypy..."; \
   mypy .
-  pylint **/*.py
+'
 """
-test = "pytest"
-cov = "coverage run -m pytest && coverage report"
+test = "pytest tests"
+cov = "sh -c 'coverage run -m pytest && coverage report'"
